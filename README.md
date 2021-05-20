@@ -12,9 +12,30 @@
 
 ## 1.2 环境准备
 
-
+![image-20210510095331698](picture/image-20210510095331698.png)
 
 ### 1.2.1 安装jenkins
+
+jenkins 镜像网站
+
+~~~bash
+https://mirrors.cloud.tencent.com/jenkins/
+https://mirrors.huaweicloud.com/jenkins/
+https://mirrors.tuna.tsinghua.edu.cn/jenkins/
+http://mirrors.ustc.edu.cn/jenkins/
+~~~
+
+#### 1) 离线安装
+
+~~~bash
+yum install -y java-1.8.0-openjdk* -y
+wget https://mirrors.tuna.tsinghua.edu.cn/jenkins/redhat-stable/jenkins-2.277.4-1.1.noarch.rpm
+rpm -ivh jenkins-2.277.4-1.1.noarch.rpm
+yum install jenkins
+systemctl start jenkins
+~~~
+
+#### 2) docker 安装
 
 安装docker
 
@@ -49,7 +70,9 @@ chmod 777 /var/jenkins_mount
 >
 > 　　--name myjenkins 给容器起一个别名
 
-```
+
+
+```bash
 docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins_mount:/var/jenkins_home -v /etc/localtime:/etc/localtime --name myjenkins jenkins/jenkins
 ```
 
@@ -57,15 +80,21 @@ docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins_mount:/var/jenkins_ho
 
 ![img](picture/1578696-20200506010532861-1239060303.png)
 
- 
+ 自己的jenkins
+
+~~~bash
+mkdir ~/jenkins
+mkdir  ~/jenkins/jenkins_mount
+mkdir  ~/jenkins/etc
+mkdir  ~/jenkins/maven
+docker run -it -d -p 10240:8080 -p 10241:5000 -u root -v ~/jenkins/jenkins_mount:/var/jenkins_home -v /etc/localtime:/etc/localtime -v ~/jenkins/maven:/var/maven -v ~/jenkins/etc/:/etc/  --name myjenkins jenkins/jenkins:lts
+~~~
 
  4.查看jenkins是否启动成功，如下图出现端口号，就为启动成功了
 
 ```
 docker ps -l
 ```
-
- 
 
 ![img](picture/1578696-20200506011320515-2141868163.png)
 
@@ -91,10 +120,10 @@ cd /var/jenkins_mount/
 
 ![img](picture/1578696-20200506012036877-994910766.png)
 
-将 url 修改为 清华大学官方镜像：
+将 url 修改为腾讯云官方镜像：
 
 ~~~
-https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
+https://mirrors.cloud.tencent.com/jenkins/updates/update-center.json
 ~~~
 
 **修改后**
@@ -103,13 +132,30 @@ https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
 
 
 
- 7.访问Jenkins页面，输入你的ip加上10240
+配置国内镜像源
+
+~~~bash
+mv /etc/apt/sources.list /etc/apt/sources.list.bak
+echo "deb http://mirrors.163.com/debian/ jessie main non-free contrib" >/etc/apt/sources.list
+echo "deb http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list
+echo "deb-src http://mirrors.163.com/debian/ jessie main non-free contrib" >>/etc/apt/sources.list
+echo "deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list
+apt-get update
+~~~
+
+
+
+
+
+#### 3) 访问jenkins
+
+1. 访问Jenkins页面，输入你的ip加上10240
 
 ![img](picture/1578696-20200506012226430-1099181802.png)
 
- 
 
- 8.管理员密码获取方法，编辑initialAdminPassword文件查看，把密码输入登录中的密码即可，开始使用。
+
+2. 管理员密码获取方法，编辑initialAdminPassword文件查看，把密码输入登录中的密码即可，开始使用。
 
 ```
 vi /var/jenkins_mount/secrets/initialAdminPassword
@@ -119,21 +165,17 @@ vi /var/jenkins_mount/secrets/initialAdminPassword
 
  
 
- 9.到此以全部安装成功，尽情的使用吧！
+3. 到此以全部安装成功，尽情的使用吧！
 
 ![img](picture/1578696-20200506013252174-1483206896.png)
 
  
-
-
 
 ### 1.2.2 安装gitlab
 
 #### 一、安装及配置
 
 ##### 1.gitlab镜像拉取
-
-
 
 ```ruby
 # gitlab-ce为稳定版本，后面不填写版本则默认pull最新latest版本
@@ -145,8 +187,6 @@ $ docker pull gitlab/gitlab-ce
 拉取镜像
 
 ##### 2.运行gitlab镜像
-
-
 
 ```csharp
 docker run -d  -p 443:443 -p 80:80 -p 222:22 --name gitlab --restart always -v /home/gitlab/config:/etc/gitlab -v /home/gitlab/logs:/var/log/gitlab -v /home/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce
@@ -256,7 +296,7 @@ image.png
 
 
 ```ruby
-$ ssh-keygen -t rsa -C 'xxx@xxx.com'
+ssh-keygen -t rsa -C 'xxx@xxx.com'
 ```
 
 然后一路回车(-C 参数是你的邮箱地址)
@@ -271,7 +311,7 @@ $ ssh-keygen -t rsa -C 'xxx@xxx.com'
 
 ```ruby
 # ~表示用户目录，比如我的windows就是C:\Users\Administrator，并复制其中的内容
-$ cat ~/.ssh/id_rsa.pub
+cat ~/.ssh/id_rsa.pub
 ```
 
 ![img](https:////upload-images.jianshu.io/upload_images/15087669-b71993bc58477957.png?imageMogr2/auto-orient/strip|imageView2/2/w/564/format/webp)
@@ -319,8 +359,8 @@ $ cat ~/.ssh/id_rsa.pub
 
 
 ```csharp
-$ git config --global user.name "你的名字"
-$ git config --global user.email "你的邮箱"
+git config --global user.name "你的名字"
+git config --global user.email "你的邮箱"
 ```
 
 ![img](https:////upload-images.jianshu.io/upload_images/15087669-9592daf5642e3c11.png?imageMogr2/auto-orient/strip|imageView2/2/w/370/format/webp)
@@ -332,7 +372,7 @@ $ git config --global user.email "你的邮箱"
 
 
 ```bash
-$ git clone 项目地址
+git clone 项目地址
 ```
 
 ![img](https:////upload-images.jianshu.io/upload_images/15087669-dc8bafb214fa578e.png?imageMogr2/auto-orient/strip|imageView2/2/w/454/format/webp)
@@ -363,7 +403,7 @@ $ git clone 项目地址
 
 
 ```ruby
-$ git status
+git status
 ```
 
 ![img](https:////upload-images.jianshu.io/upload_images/15087669-364b83d323ceb46b.png?imageMogr2/auto-orient/strip|imageView2/2/w/562/format/webp)
@@ -377,7 +417,7 @@ $ git status
 
 
 ```csharp
-$ git add  测试提交的文件.txt
+git add  测试提交的文件.txt
 ```
 
 (“git add“后加“.”则添加全部文件，也可以加"*.txt"表示添加全部需要提交的txt文件 )
@@ -391,7 +431,7 @@ add需要提交的文件
 
 
 ```ruby
-$ git commit -m "message"
+git commit -m "message"
 ```
 
 ![img](https:////upload-images.jianshu.io/upload_images/15087669-6d689c385f30fe33.png?imageMogr2/auto-orient/strip|imageView2/2/w/560/format/webp)
@@ -403,7 +443,7 @@ commit
 
 
 ```ruby
-$ git push origin master
+git push origin master
 ```
 
 ![img](https:////upload-images.jianshu.io/upload_images/15087669-889169ad267f2997.png?imageMogr2/auto-orient/strip|imageView2/2/w/510/format/webp)
@@ -412,32 +452,866 @@ $ git push origin master
 
 
 
-### 1.2.3 gitlab占用内存太多
-
-
+### 1.2.3 gitlab占用内存太多问题
 
 修改/etc/gitlab/gitlab.rb
 
 ```
-#2019-12-4 add by lishuo  start
-unicorn['worker_processes'] = 4
-#2019-12-4 add by lishuo end
- 
- 
-#2019-12-4 add by lishuo  start
+unicorn['worker_processes'] = 2
 postgresql['max_worker_processes'] = 4
-#2019-12-4 add by lishuo  end
- 
- 
-#2019-12-4 add by lishuo  start
 nginx['worker_processes'] = 4
-#2019-12-4 add by lishuo  end
 ```
 
 重新运行
 
 ```
 gitlab-ctl reconfigure  #gitlab会读取配置文件参数并修改各个插件的配置文件去（我猜的）
- 
 gitlab-ctl restart
 ```
+
+
+
+
+
+# 2. 入门
+
+## 2.1 安装中文插件
+
+![image-20210510095033219](picture/image-20210510095033219.png)
+
+
+
+## 2.2 角色控制Role-Based Strategy
+
+
+
+![image-20210510102844184](picture/image-20210510102844184.png)
+
+点击"Manage Roles"
+
+![image-20210510102901425](picture/image-20210510102901425.png)
+
+进行角色的管理
+
+![image-20210510102914324](picture/image-20210510102914324.png)
+
+## 
+
+
+
+## 2.3 安装凭证
+
+
+
+
+
+## 2.4 jenkins拉取项目
+
+### gitlab 
+
+#### 1. 设置全局凭据
+
+![image-20210510103928691](picture/image-20210510103928691.png)
+
+点击添加凭据
+
+![image-20210510104120595](picture/image-20210510104120595.png)
+
+输入Gitee 账号、密码 ID可以任意填写，描述框可以根据项目来撰写
+![在这里插入图片描述](picture/20210125172004897.png)
+
+类型项一定要选择
+
+![在这里插入图片描述](picture/20210125172017359.png)
+
+#### 2. 新建Item
+
+Jenkins首页—Item—新建
+也可以进入到已有的Item里，再新建一个Item
+
+![在这里插入图片描述](picture/20210125172039419.png)
+
+输入项目名称，一般用项目名称来命名，然后选择流水线，确定
+
+![在这里插入图片描述](picture/20210125172051784.png)
+
+项目创建完毕
+
+![image-20210510104546158](picture/image-20210510104546158.png)
+
+#### 3、具体任务配置
+
+Jenkins首页—相应Item—配置----流水线—址—生成流水线脚本
+
+![在这里插入图片描述](picture/20210125172112844.png)
+
+\#去gitee克隆代码地址
+
+![在这里插入图片描述](picture/20210125172126126.png)
+
+配置在Jenkins上
+
+![在这里插入图片描述](picture/20210210201846492.png)
+
+![在这里插入图片描述](picture/20210125172145431.png)
+
+复制脚本
+
+![在这里插入图片描述](picture/20210125172156393.png)
+
+\#这下面是配置构建脚本，注意Jenkins支持任何语言编写的项目的构建
+![在这里插入图片描述](picture/20210125172206281.png)
+
+粘贴需要构建的代码链接和要执行的ssh命令，建议每次构建都加上ls -l 验证是否成功，应用 保存
+
+![在这里插入图片描述](picture/20210125172221619.png)
+
+#### 4、构建验证
+
+进入任务，点击立即构建，成功的话会显示绿色，可以在Build History验证是否成功
+
+![在这里插入图片描述](picture/20210125172234687.png)
+
+点击任务，进入任务页面，选择控制台输出，可以看到构建的详细日志，如果构建失败，可以在日志中查看失败原因：
+![在这里插入图片描述](picture/20210125172250520.png)
+
+### 拉取gitee 项目
+
+#### 1. 安装gitee 插件
+
+![image-20210510104930930](picture/image-20210510104930930.png)
+
+#### 2. 添加Gitee链接配置
+
+前往 Jenkins -> Manage Jenkins -> Configure System -> Gitee Configuration -> Gitee connections
+
+![image-20210510105938146](picture/image-20210510105938146.png)
+
+点击进行数据的配置
+
+![image-20210510105954742](picture/image-20210510105954742.png)
+
+在 `Connection name` 中输入 `Gitee` 或者你想要的名字
+
+`Gitee host URL` 中输入Gitee完整 URL地址： `https://gitee.com` （Gitee私有化客户输入部署的域名）
+
+`Credentials`中如还未配置Gitee APIV5 私人令牌，点击Add ->Jenkins
+
+> 1. `Domain` 选择 `Global credentials`
+> 2. `Kind` 选择 `Gitee API Token`
+> 3. `Scope` 选择你需要的范围
+> 4. `Gitee API Token` 输入你的Gitee私人令牌，获取地址：https://gitee.com/profile/personal_access_tokens
+> 5. `ID`, `Descripiton` 中输入你想要的 ID 和描述即可。
+
+![image-20210510110612637](picture/image-20210510110612637.png)
+
+1. `Credentials` 选择配置好的 Gitee APIV5 Token
+
+2. 点击 `Advanced` ，可配置是否忽略 SSL 错误（视您的Jenkins环境是否支持），并可设置链接测超时时间（视您的网络环境而定）
+
+3. 点击 `Test Connection` 测试链接是否成功，如失败请检查以上 3，5，6 步骤。
+
+![image-20210510110655803](picture/image-20210510110655803.png)
+
+配置成功后如图所示：
+![Gitee链接配置](picture/185651_68707d16_58426.png)
+
+#### 3. 新建构建任务
+
+前往 Jenkins -> New Item , name 输入 'Gitee Test'，选择 `Freestyle project` 保存即可创建构建项目。
+
+#### 4. 任务全局配置
+
+任务全局配置中需要选择前一步中的Gitee链接。前往某个任务（如'Gitee Test'）的 Configure -> General，Gitee connection 中选择前面所配置的Gitee链接，如图：
+
+![image-20210510111209353](picture/image-20210510111209353.png)
+
+
+
+
+
+## 2.5 安装maven
+
+
+
+
+
+## 2.6 安装tomcat
+
+安装jdk
+
+~~~bash
+yum install -y java-1.8.0-openjdk* -y
+~~~
+
+安装tomcat
+
+~~~
+mkdir tomcat
+cd tomcat
+wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-10/v10.0.6/bin/apache-tomcat-10.0.6.tar.gz
+tar -zxvf apache-tomcat-10.0.6.tar.gz
+~~~
+
+编辑用户信息
+
+~~~bash
+vim apache-tomcat-10.0.6//conf/tomcat-users.xml
+~~~
+
+设置用户信息
+
+~~~bash
+<tomcat-users>
+   <role rolename="tomcat"/> 
+   <role rolename="role1"/>
+   <role rolename="manager-script"/> 
+   <role rolename="manager-gui"/>
+   <role rolename="manager-status"/>
+   <role rolename="admin-gui"/>
+   <role rolename="admin-script"/> 
+   <user username="tomcat" password="tomcat" roles="manager-gui,manager- script,tomcat,admin-gui,admin-script"/> 
+</tomcat-users>
+~~~
+
+开放外网访问权限
+
+~~~bash
+vim webapps/manager/META-INF/context.xml
+~~~
+
+注释信息
+
+![image-20210518154402642](picture/image-20210518154402642.png)
+
+~~~bash
+<!-- 
+<Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> 
+-->
+~~~
+
+修改端口号--看需求
+
+~~~bash
+vim conf/server.xml
+~~~
+
+修改完配置为
+
+![image-20210518154843683](picture/image-20210518154843683.png)
+
+
+
+开启tomcat
+
+~~~bash
+./startup.sh
+~~~
+
+![image-20210518155025222](picture/image-20210518155025222.png)
+
+
+
+输入tomcat,密码tomcat
+
+![image-20210518155050999](picture/image-20210518155050999.png)
+
+进入管理界面
+
+![image-20210518155250939](picture/image-20210518155250939.png)
+
+
+
+# 3. jenkins 风格类型
+
+
+
+## 3.1 自由风格类型
+
+拉取代码->编译->打包->部署
+
+### 3.1.1 拉取代码
+
+![image-20210518160244635](picture/image-20210518160244635.png)
+
+### 3.1.2 编译
+
+构建->添加构建步骤->Executor Shell
+
+![image-20210518160456620](picture/image-20210518160456620.png)
+
+~~~bash
+echo "开始编译和打包" 
+mvn clean package 
+echo "编译和打包结束"
+~~~
+
+![image-20210518160557558](picture/image-20210518160557558.png)
+
+
+
+这个时候会报错，
+
+![image-20210518161038144](picture/image-20210518161038144.png)
+
+解决方法
+
+~~~bash
+echo $PATH
+~~~
+
+复制path 路径，点击全局配置，添加全局属性
+
+![image-20210518161757355](picture/image-20210518161757355.png)
+
+### 3.1.3 部署
+
+把项目部署到远程的Tomcat里面
+
+安装 Deploy to container插件
+
+点击构建后操作
+
+![image-20210518162545887](picture/image-20210518162545887.png)
+
+添加tomcat 的凭证
+
+![image-20210519101442247](picture/image-20210519101442247.png)
+
+构件后操作
+
+![image-20210519101503486](picture/image-20210519101503486.png)
+
+就可以打包成功
+
+## 3.2 Maven 风格类型
+
+### 3.2.1 安装Maven Integration插件
+
+![image-20210519111628230](picture/image-20210519111628230.png)
+
+### 3.2.2 创建Maven项目
+
+![image-20210519111646577](picture/image-20210519111646577.png)
+
+
+
+### 3.2.3 配置项目
+
+![image-20210519111712992](picture/image-20210519111712992.png)
+
+
+
+## 3.3 流水线风格类型
+
+> Pipeline 脚本是由 **Groovy** 语言实现的，但是我们没必要单独去学习 Groovy
+>
+> Pipeline 支持两种语法：**Declarative**(声明式)和 **Scripted Pipeline**(脚本式)语法
+>
+> Pipeline 也有两种创建方法：可以直接在 Jenkins 的 Web UI 界面中输入脚本；也可以通过创建一
+>
+> 个 Jenkinsfifile 脚本文件放入项目源码库中（一般我们都推荐在 Jenkins 中直接从源代码控制(SCM)
+>
+> 中直接载入 Jenkinsfifile Pipeline 这种方法）。
+
+
+
+### 3.3.1 安装pipline 
+
+![image-20210519160939109](picture/image-20210519160939109.png)
+
+
+
+### 3.3.2 创建项目
+
+![image-20210519161009364](picture/image-20210519161009364.png)
+
+
+
+### 3.3.3 拉取代码
+
+![image-20210519161033183](picture/image-20210519161033183.png)
+
+自定义流水线
+
+
+
+![image-20210519161120562](picture/image-20210519161120562.png)
+
+构建流水线语法
+
+![image-20210519162445601](picture/image-20210519162445601.png)
+
+拉取代码
+
+![image-20210519162647350](picture/image-20210519162647350.png)
+
+
+
+生成pipline 代码
+
+![image-20210519162806786](picture/image-20210519162806786.png)
+
+构件代码
+
+~~~
+pipeline {
+    agent any
+
+    stages {
+        stage('pull code') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: '1527f9a8-f6ed-41b3-93a7-c05a88f36de9', url: 'https://gitee.com/fakerlove/clock']]])
+            }
+        }
+          stage('build project') {
+            steps {
+               sh 'mvn clean package'
+            }
+        }
+          stage("sa") {
+            steps {
+                echo 'goujian构件wancheng'
+            }
+        }
+    }
+    
+}
+
+~~~
+
+### 3.3.4 构建成功
+
+![image-20210519161212583](picture/image-20210519161212583.png)
+
+## 3.4 jenkins 常见的触发器
+
+jenkins 常见触发器
+
+![image-20210519170109920](picture/image-20210519170109920.png)
+
+其中gitee为安装了gitee 插件后，出现的触发
+
+默认有4种
+
+* 触发远程构建
+* 轮训SCM
+* 其他工程构建后触发
+* 定时构建
+
+### 3.4.1 gitee 触发器
+
+gitee 设置签发文章
+
+~~~bash
+https://gitee.com/help/articles/4193#article-header9
+~~~
+
+在jenkins 上设置触发器，点击生成秘钥
+
+![image-20210519171306631](picture/image-20210519171306631.png)
+
+gitee设置webHook
+
+![image-20210519171342064](picture/image-20210519171342064.png)
+
+
+
+修改代码，提交至gitee,jenkins立即进行了刷新测试
+
+![image-20210519171638974](picture/image-20210519171638974.png)
+
+### 3.4.2 触发远程构建
+
+设置token信息
+
+![image-20210519171843116](picture/image-20210519171843116.png)
+
+输入网址即可进行触发
+
+~~~bash
+http://192.168.66.101:8888/job/web_demo_pipeline/build?token=6666
+~~~
+
+### 3.4.3 其他工程创建触发
+
+创建pre_job流水线工程
+
+![image-20210519173346089](picture/image-20210519173346089.png)
+
+配置需要触发的工程
+
+![image-20210519173408602](picture/image-20210519173408602.png)
+
+### 3.4.4 定时构建
+
+![image-20210519173428203](picture/image-20210519173428203.png)
+
+> 每30分钟构建一次：H代表形参 H/30 * * * * 10:02 10:32
+>
+> 每2个小时构建一次: H H/2 * * *
+>
+> 每天的8点，12点，22点，一天构建3次： (多个时间点中间用逗号隔开) 0 8,12,22 * * *
+>
+> 每天中午12点定时构建一次 H 12 * * *
+>
+> 每天下午18点定时构建一次 H 18 * * *
+>
+> 在每个小时的前半个小时内的每10分钟 H(0-29)/10 * * * *
+>
+> 每两小时一次，每个工作日上午9点到下午5点(也许是上午10:38，下午12:38，下午2:38，下午
+>
+> 4:38) H H(9-16)/2 * * 1-5
+
+### 3.4.5 参数化构建
+
+
+
+
+
+## 3.5 邮件发送
+
+### 3.5.1 安装插件
+
+![image-20210520102548901](picture/image-20210520102548901.png)
+
+
+
+### 3.5.2 开启邮箱支持
+
+开启权限
+
+![image-20210520103028041](picture/image-20210520103028041.png)
+
+点击生成授权码
+
+![image-20210520103307250](picture/image-20210520103307250.png)
+
+发送配置短信，发送完成后，点击我已发送、获取密码
+
+![image-20210520103323603](picture/image-20210520103323603.png)
+
+
+
+### 3.5.3 配置
+
+配置邮件管理员
+
+![image-20210520105311778](picture/image-20210520105311778.png)
+
+配置Extended
+
+![image-20210520105355585](picture/image-20210520105355585.png)
+
+配置 jenkins 默认邮箱
+
+![image-20210520105543453](picture/image-20210520105543453.png)
+
+
+
+点击测试
+
+![image-20210520105600860](picture/image-20210520105600860.png)
+
+
+
+
+
+在项目的根目录下创建email.html
+
+~~~html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${ENV, var="JOB_NAME"}-第${BUILD_NUMBER}次构建日志</title>
+</head>
+<body leftmargin="8" marginwidth="0" topmargin="8" marginheight="4" offset="0">
+<table width="95%" cellpadding="0" cellspacing="0"
+       style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans- serif">
+    <tr>
+        <td>(本邮件是程序自动下发的，请勿回复！)</td>
+    </tr>
+    <tr>
+        <td>
+            <h2>
+                <span style="color: #0000FF; ">构建结果 - ${BUILD_STATUS}</span>
+            </h2>
+        </td>
+    </tr>
+    <tr>
+        <td><br/> <b><span style="color: #0B610B; ">构建信息</span></b>
+            <hr size="2" width="100%" align="center"/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <ul>
+                <li>项目名称&nbsp;：&nbsp;${PROJECT_NAME}</li>
+                <li>构建编号&nbsp;：&nbsp;第${BUILD_NUMBER}次构建</li>
+                <li>触发原因：&nbsp;${CAUSE}</li>
+                <li>构建日志：&nbsp;<a href="${BUILD_URL}console">${BUILD_URL}console</a></li>
+                <li>构建&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${BUILD_URL}">${BUILD_URL}</a></li>
+                <li>工作目录&nbsp;：&nbsp;<a href="${PROJECT_URL}ws">${PROJECT_URL}ws</a></li>
+                <li>项目&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${PROJECT_URL}">${PROJECT_URL}</a></li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><b><span style="color: #0B610B; ">Changes Since Last Successful Build:</span></b>
+            <hr size="2" width="100%" align="center"/>
+        </td>
+    </tr>
+    编写Jenkinsfile添加构建后发送邮件
+    <tr>
+        <td>
+            <ul>
+                <li>历史变更记录 : <a href="${PROJECT_URL}changes">${PROJECT_URL}changes</a></li>
+            </ul>
+            ${CHANGES_SINCE_LAST_SUCCESS,reverse=true, format="Changes for Build #%n:<br/>%c<br/>",showPaths=true,changesFormat="
+            <pre>[%a]<br/>%m</pre>
+            ",pathFormat="&nbsp;&nbsp;&nbsp;&nbsp;%p"}
+        </td>
+    </tr>
+    <tr>
+        <td><b>Failed Test Results</b>
+            <hr size="2" width="100%" align="center"/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <pre style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans-serif">$FAILED_TESTS</pre>
+            <br/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                <span style="color: #0B610B; ">构建日志 (最后 100行):</span>
+            </b>
+            <hr size="2" width="100%" align="center"/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <textarea cols="80" rows="30" readonly="readonly" style="font-family: Courier New">
+                ${BUILD_LOG, maxLines=100}
+            </textarea>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+~~~
+
+![image-20210520110622468](picture/image-20210520110622468.png)
+
+
+
+修改流水线的语法，在最后添加pipline 语法
+
+~~~groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('pull code') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: '1527f9a8-f6ed-41b3-93a7-c05a88f36de9', url: 'https://gitee.com/fakerlove/clock']]])
+            }
+        }
+          stage('build project') {
+            steps {
+               sh 'mvn clean package'
+            }
+        }
+          stage("sa") {
+            steps {
+                echo 'goujian构件wancheng'
+            }
+        }
+    }
+    post { 
+        always {
+            emailext(
+                subject: '构建通知：${PROJECT_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}!', 
+                body: '${FILE,path="email.html"}', 
+                to: '203462009@qq.com' ) 
+        }
+    }
+}
+~~~
+
+
+
+点击重新构建，构建完成后，会接收到邮件信息
+
+![image-20210520112034362](picture/image-20210520112034362.png)
+
+
+
+## 3.6 SonarQube 代码审查
+
+
+
+
+
+# 4. Docker+SpringCloud 
+
+## 4.1 环境准备
+
+![image-20210520163648458](picture/image-20210520163648458.png)
+
+* docker
+* jenkins 
+* maven
+* harbor 私有的镜像仓库
+
+### 4.1.1 docker的安装
+
+centos 7
+
+~~~bash
+yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+yum install -y yum-utils
+yum-config-manager \
+    --add-repo \
+    http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+yum makecache fast
+yum install docker-ce docker-ce-cli containerd.io -y
+systemctl start docker
+docker version
+~~~
+
+centos 8
+
+~~~bash
+yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+yum install -y yum-utils
+yum makecache 
+yum install -y wget
+wget -O /etc/yum.repos.d/CenOS-Base.repo https://mirrors.aliyun.com/repo/Centos-8.repo
+yum clean all
+yum install -y https://download.docker.com/linux/centos/8/x86_64/stable/Packages/containerd.io-1.4.3-3.1.el8.x86_64.rpm
+yum install docker-ce docker-ce-cli -y
+systemctl start docker
+docker version
+~~~
+
+容器镜像加速
+
+~~~bash
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://ip92h4jn.mirror.aliyuncs.com"]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+~~~
+
+
+
+### 4.1.2 docker-compose 安装
+
+compose 网址
+
+~~~bash
+https://github.com/docker/compose/releases
+~~~
+
+安装docker-compose
+
+~~~bash
+sudo curl -L "https://gitee.com/fakerlove/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+docker-compose --version
+~~~
+
+centos7 可以选择如下安装
+
+~~~bash
+yum -y install python-pip
+pip install --upgrade pip
+pip install docker-compose
+docker-compose -version
+~~~
+
+### 4.1.3 harbor 安装
+
+在github 上找到适合自己的版本
+
+~~~bash
+https://github.com/goharbor/harbor/tags
+~~~
+
+最低的需求配置
+
+![image-20210520151346044](picture/image-20210520151346044.png)
+
+上传下载的软件，并解压
+
+~~~bash
+ tar -zxvf harbor-offline-installer-v2.2.2.tgz -C /usr/local/
+~~~
+
+复制yml
+
+~~~bash
+cd /usr/local/harbor/
+cp harbor.yml.tmpl harbor.yml
+vim harbor.yml
+~~~
+
+修改一下三个部分信息
+
+![image-20210520161249318](picture/image-20210520161249318.png)
+
+
+
+启动脚本
+
+~~~bash
+./install.sh
+~~~
+
+![image-20210520161403576](picture/image-20210520161403576.png)
+
+等启动成功,输入网址
+
+~~~bash
+http://121.37.175.163/
+~~~
+
+![image-20210520161615617](picture/image-20210520161615617.png)
+
+
+
+如果默认80 网址，有服务，即可修改端口信息
+
+![image-20210520161626732](picture/image-20210520161626732.png)
+
+
+
+
+
+## 4.2 
+
+
+

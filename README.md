@@ -1281,7 +1281,7 @@ vim harbor.yml
 
 修改一下三个部分信息
 
-![image-20210520161249318](picture/image-20210520161249318.png)
+![image-20210521212145966](picture/image-20210521212145966.png)
 
 
 
@@ -1311,7 +1311,589 @@ http://121.37.175.163/
 
 
 
-## 4.2 
+### 4.1.4 Harbor 使用
+
+创建harbor项目
+
+![image-20210521094535809](picture/image-20210521094535809.png)
+
+创建镜像，给镜像把tag
+
+121.37.175.163 为Harbor的网址，jenkins为Harbor的用户信息，myjenkins 为镜像名字
+
+<font color=red>注意点</font>
+
+80端口的话，打tag 时不能添加80，直接就是ip 地址即可，其中clock 为项目名。kk 为在仓库中镜像的名字
+
+~~~bash
+docker tag jenkins/jenkins:latest 121.37.175.163/clock/kk:1.0
+~~~
+
+![image-20210521213410151](picture/image-20210521213410151.png)
+
+添加受信任名单
+
+![image-20210521095547573](picture/image-20210521095547573.png)
+
+~~~bash
+vim /etc/docker/daemon.json
+~~~
+
+添加一下内容
+
+~~~bash
+{
+  "registry-mirrors": ["https://ip92h4jn.mirror.aliyuncs.com"],
+  "insecure-registries": ["121.37.175.163:80"]
+}
+~~~
+
+使用Harbor 账户登录docker
+
+~~~bash
+systemctl daemon-reload
+systemctl restart docker
+docker login 121.37.175.163 -u admin -p 123456
+~~~
+
+上传镜像
+
+~~~bash
+docker push  121.37.175.163/clock/kk:1.0
+~~~
+
+![image-20210522115421027](picture/image-20210522115421027.png)
+
+如果报错
+
+~~~bash
+Get http://harbor.phc-dow.com/v2/: Get http://harbor.phc-dow.com:180/service/token?account=admin&client_id=docker&offline_token=true&service=harbor-registry: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers) (Client.Timeout exceeded while awaiting headers)
+~~~
+
+解决方案
+
+1. 检查是否添加信任名单，
+2. 检查是否填写外网网址
+3. 检查用户名和密码
+4. 检查端口号，是否填写正确
+5. 检查防火墙和安全组是否开放
+
+最后试试以下内容
+
+~~~bash
+vim /etc/sysctl.conf
+net.ipv4.ip_forward = 1 #最后一行写入
+sysctl -p
+~~~
+
+
+
+## 4.2 使用DockerFile插件生成镜像
+
+### 4.2.1添加打包插件
+
+~~~bash
+  <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.13</version>
+                <configuration>
+                    <repository>${project.artifactId}</repository>
+                    <buildArgs>
+                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+~~~
+
+### 4.2.2 编写Dockerfile 文件
+
+~~~bash
+FROM openjdk:8-jdk-alpine
+EXPOSE 8081
+ARG JAR_FILE
+ADD ${JAR_FILE} /app.jar
+ENTRYPOINT ["java", "-jar","/app.jar"]
+~~~
+
+
+
+![image-20210522170028697](picture/image-20210522170028697.png)
+
+修改jenkins 信息
+
+### 4.2.3 打包镜像，并上传服务器
+
+可以使用阿里云的镜像容器服务，或者自己的harbor私人镜像仓库
+
+使用流水线语法，进行上传服务
+
+![image-20210523095155330](picture/image-20210523095155330.png)
+
+~~~groovy
+pipeline {
+    agent any
+    environment {
+        tag = 'latest'
+        //阿里云的镜像存储空间
+        harbor_url = 'registry.cn-shanghai.aliyuncs.com'
+        //镜像存储的命名空间
+        harbor_project_name = 'jokerak' //Harbor的凭证
+        harbor_auth = 'ef499f29-f138-44dd-975e-ff1ca1d8c933'
+        // 项目名
+        project_name = 'clock'
+
+        imageName = "${project_name}:${tag}"
+    }
+
+    stages {
+        stage('拉取代码') {
+            steps {
+                checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: '*/master']],
+                            extensions: [],
+                            userRemoteConfigs:
+                            [[credentialsId:
+                            '1527f9a8-f6ed-41b3-93a7-c05a88f36de9',
+                            url: 'https://gitee.com/fakerlove/clock']
+                            ]
+                       ])
+            }
+        }
+        stage('打包编译项目，创建镜像，上传镜像') {
+            steps {
+                // 打包编译项目
+                sh 'mvn clean package dockerfile:build'
+
+                // 给镜像打tag
+                sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName}"
+
+                withCredentials([usernamePassword(credentialsId: '5b07edf3-bfb8-49e7-8b27-a6d600ef99d8', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    // 登录镜像
+                    sh "docker login -u ${username} -p ${password} ${harbor_url}"
+                    //上传镜像
+                    sh "docker push ${harbor_url}/${harbor_project_name}/${imageName}"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // 发送邮件
+            emailext(
+                subject: '构建通知：${PROJECT_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}!',
+                body: '${FILE,path="email.html"}',
+                to: '203462009@qq.com' )
+        }
+    }
+}
+~~~
+
+### 4.2.4 拉取镜像并部署
+
+#### 1) 安装插件
+
+安装以下插件，可以实现远程发送Shell命令
+
+![image-20210523095613420](picture/image-20210523095613420.png)
+
+
+
+首先在jenkins 所在服务器下生成ssh ,<font color=red>2.277 版本一下不支持一下生成公钥。不知道现在2.932 还支不支持</font>
+
+~~~bash
+ssh-keygen -o
+~~~
+
+可以试一下
+
+~~~bash
+ssh-keygen -m PEM -t rsa -b 4096
+~~~
+
+说明：
+
+```
+-m 参数指定密钥的格式，PEM是rsa之前使用的旧格式
+ -b 指定密钥长度。对于RSA密钥，最小要求768位，默认是2048位。
+```
+
+拷贝公钥到服务器中
+
+~~~bash
+ssh-copy-id 121.37.175.163
+~~~
+
+![image-20210523100212577](picture/image-20210523100212577.png)
+
+
+
+#### 2) 添加远程服务器
+
+系统配置->添加远程服务器
+
+修改公钥权限,复制公钥值jenkins目录下，以防没有权限访问
+
+~~~bash
+mkdir /var/lib/jenkins/.ssh
+cp /root/.ssh/* /var/lib/jenkins/.ssh/
+~~~
+
+![image-20210523101501916](picture/image-20210523101501916.png)
+
+点击测试
+
+![image-20210523161243920](picture/image-20210523161243920.png)
+
+#### 3) 上传代码
+
+使用流水线语法生成器
+
+![](picture/image-20210523165536347.png)
+
+
+
+创建流水线语法
+
+~~~bash
+  sshPublisher(
+                    publishers:
+                [sshPublisherDesc(configName: '华为云服务器',
+                transfers: [
+                    sshTransfer(
+                        cleanRemote: false,
+                        excludes: '',
+                        execCommand: "/opt/jenkins_shell/deploy.sh $harbor_url $harbor_project_name $project_name $tag $port",
+                        execTimeout: 120000,
+                        flatten: false,
+                        makeEmptyDirs: false,
+                        noDefaultExcludes: false,
+                        patternSeparator: '[, ]+',
+                        remoteDirectory: '',
+                        remoteDirectorySDF: false,
+                        removePrefix: '',
+                        sourceFiles: '')],
+                        usePromotionTimestamp: false,
+                        useWorkspaceInPromotion: false,
+                        verbose: false)])
+~~~
+
+在部署服务的服务器上创建deploy.sh
+
+~~~bash
+#! /bin/sh #接收外部参数 
+harbor_url=$1 
+harbor_project_name=$2 
+project_name=$3 
+tag=$4 
+port=$5 
+imageName=$harbor_url/$harbor_project_name/$project_name:$tag 
+echo "$imageName" #查询容器是否存在，存在则删除 
+containerId=`docker ps -a | grep -w ${project_name}:${tag} | awk '{print $1}'` 
+if [ "$containerId" != "" ] ; then 
+#停掉容器 
+  docker stop $containerId 
+#删除容器 
+  docker rm $containerId 
+  echo "成功删除容器"
+fi
+#查询镜像是否存在，存在则删除 
+imageId=`docker images | grep -w $project_name | awk '{print $3}'`
+if [ "$imageId" != "" ] ; then 
+#删除镜像 
+ docker rmi -f $imageId
+ echo "成功删除镜像" 
+fi
+# 登录Harbor私服 
+docker login -u itcast -p Itcast123 $harbor_url 
+# 下载镜像 
+docker pull $imageName 
+# 启动容器 
+docker run -di -p $port:$port -v /etc/localtime:/etc/localtime $imageName
+echo "容器启动成功"
+~~~
+
+
+
+
+
+### <font color=red>4.2.5 出现的错误如下</font>
+
+1. 找不到打包插件
+
+   更换maven 镜像
+
+   ~~~bash
+   	<mirror>
+   			<id>
+   				alimaven
+   			</id>
+   			
+   			<mirrorOf>
+   				*
+   			</mirrorOf>
+   			
+   			<name>
+   				aliyun maven
+   			</name>
+   			
+   			<url>
+   				https://maven.aliyun.com/repository/public
+   			</url>
+   		</mirror>
+   ~~~
+
+2. 无法创建maven包
+
+   修改maven 仓库权限
+
+   ~~~bash
+   chmod 777 /var/lib/res
+   ~~~
+
+3. Jenkins: unix://localhost:80: Permission denied
+
+   ~~~bash
+   chmod 777 /var/run/docker.sock
+   ~~~
+
+
+
+### 4.2.6 流水线的总代码
+
+~~~groovy
+pipeline {
+    agent any
+    environment {
+        tag = 'latest'
+        //阿里云的镜像存储空间
+        harbor_url = 'registry.cn-shanghai.aliyuncs.com'
+        //镜像存储的命名空间
+        harbor_project_name = 'jokerak' //Harbor的凭证
+        harbor_auth = 'ef499f29-f138-44dd-975e-ff1ca1d8c933'
+        // 项目名
+        project_name = 'clock'
+        port = '8081'
+        imageName = "${project_name}:${tag}"
+    }
+
+    stages {
+        stage('拉取代码') {
+            steps {
+                checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: '*/master']],
+                            extensions: [],
+                            userRemoteConfigs:
+                            [[credentialsId:
+                            '1527f9a8-f6ed-41b3-93a7-c05a88f36de9',
+                            url: 'https://gitee.com/fakerlove/clock']
+                            ]
+                       ])
+            }
+        }
+        stage('打包编译项目，创建镜像，上传镜像') {
+            steps {
+                // 打包编译项目
+                sh 'mvn clean package dockerfile:build'
+
+                // 给镜像打tag
+                sh "docker tag ${imageName} ${harbor_url}/${harbor_project_name}/${imageName}"
+
+                withCredentials([usernamePassword(credentialsId: '5b07edf3-bfb8-49e7-8b27-a6d600ef99d8', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    // 登录镜像
+                    sh "docker login -u ${username} -p ${password} ${harbor_url}"
+                    //上传镜像
+                    sh "docker push ${harbor_url}/${harbor_project_name}/${imageName}"
+                }
+            }
+        }
+        stage('拉取镜像，部署服务') {
+            steps {
+                sshPublisher(
+                    publishers:  [
+                     sshPublisherDesc(
+                     configName: 'cloud',
+                     transfers: [
+                      sshTransfer(
+                        cleanRemote: false,
+                        excludes: '',
+                        execCommand: "/opt/jenkins_shell/deploy.sh $harbor_url $harbor_project_name $project_name $tag $port",
+                        execTimeout: 120000,
+                        flatten: false,
+                        makeEmptyDirs: false,
+                        noDefaultExcludes: false,
+                        patternSeparator: '[, ]+',
+                        remoteDirectory: '',
+                        remoteDirectorySDF: false,
+                        removePrefix: '',
+                        sourceFiles: '')],
+                        usePromotionTimestamp: false,
+                        useWorkspaceInPromotion: false,
+                        verbose: false)])
+            }
+        }
+    }
+    post {
+        always {
+            // 发送邮件
+            emailext(
+                subject: '构建通知：${PROJECT_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}!',
+                body: '${FILE,path="email.html"}',
+                to: '203462009@qq.com' )
+        }
+    }
+}
+~~~
+
+
+
+## 4.3 部署静态网站
+
+### 4.3.1 安装ngnix
+
+~~~bash
+yum install epel-release
+yum -y install nginx
+~~~
+
+修改配置文件,修改端口信息
+
+~~~bash
+vi /etc/nginx/nginx.conf
+~~~
+
+![image-20210524103241829](picture/image-20210524103241829.png)
+
+
+
+要关闭selinux
+
+~~~bash
+vi /etc/selinux/config
+~~~
+
+永久关闭 SELINUX=disabled
+
+![image-20210524103436326](picture/image-20210524103436326.png)
+
+
+
+启动ngnix
+
+~~~bash
+systemctl start nginx
+~~~
+
+![image-20210524103555607](picture/image-20210524103555607.png)
+
+
+
+### 4.3.2 安装nodejs 插件
+
+搜索插件NodeJS
+
+![image-20210524104356108](picture/image-20210524104356108.png)
+
+### 4.3.3 安装nodejs
+
+尽量使用自己的npm,因为需要配置镜像，自己的环境搭建起来
+
+~~~bash
+wget https://npm.taobao.org/mirrors/node/v14.16.1/node-v14.16.1-linux-x64.tar.xz
+xz -d node-v14.16.1-linux-x64.tar.xz
+tar -xvf node-v14.16.1-linux-x64.tar
+mkdir -p  /var/lib/node 
+rm -rf /var/lib/node/*
+cp ~/node-v14.16.1-linux-x64/* /var/lib/node -r
+chmod 777 -R /var/lib/node
+ln -s /var/lib/node/bin/node /usr/bin/node
+ln -s /var/lib/node/bin/npm /usr/bin/npm
+npm config set registry https://registry.npm.taobao.org
+vim /etc/profile
+export PATH=/var/lib/node/bin:$PATH
+source /etc/profile
+~~~
+
+![image-20210524145722467](picture/image-20210524145722467.png)
+
+### 4.3.4 创建项目
+
+一定要修改连接的根目录，不然会出现问题
+
+![image-20210524153948557](picture/image-20210524153948557.png)
+
+创建一个Vue的项目。vue-cli3 脚手架创建项目。然后创建Jenkinsfile 文件
+
+在流水线语法生成器，生成语法
+
+![image-20210524145646139](picture/image-20210524145646139.png)
+
+### 4.3.5 Jenkinsfile 代码
+
+~~~bash
+
+~~~
+
+
+
+## 4.4 SpringCloud 打包服务
+
+注意点
+
+* common 工程中，不能够使用springboot 的打包插件，必须移除common 父工程的打包插件
+
+使用,-f 指定特定工程进行打包
+
+~~~bash
+mvn -f common clean install
+~~~
+
+![image-20210524190538534](picture/image-20210524190538534.png)
+
+
+
+
+
+### 4.4.1 修改配置
+
+~~~bash
+# 集群版
+spring:
+  application:
+    name: EUREKA-HA
+---
+server:
+  port: 10086
+spring: # 指定profile=eureka-server1
+  profiles: eureka-server1
+eureka:
+  instance: # 指定当profile=eureka-server1时，主机名是eureka-server1
+    hostname: 192.168.66.103
+  client:
+    service-url: # 将自己注册到eureka-server1、eureka-server2这个Eureka上面去
+      defaultZone: http://192.168.66.103:10086/eureka/,http://192.168.66.104:10086/eureka/
+      
+---
+
+server:
+ port: 10086
+spring:
+ profiles: eureka-server2
+eureka:
+ instance:
+  hostname: 192.168.66.104
+ client:
+  service-url:
+   defaultZone: http://192.168.66.103:10086/eureka/,http://192.168.66.104:10086/eureka/
+~~~
+
+
+
+### 4.4.2 安装插件
+
+安装Extended Choice Parameter 
 
 
 

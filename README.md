@@ -8,11 +8,11 @@
 
 我说下我以前开发的痛点，在一些中小型企业，每次开发一个项目完成后，需要打包部署，可能没有专门的运维人员，只能开发人员去把项目打成一个war包，可能这个项目已经上线了，需要把服务关，在部署到服务器上，将项目启动起来，这个时候可能某个用户正在操作某些功能上的东西，如果你隔三差五的部署一下，这样的话对用户的体验也不好，自己也是烦的很，总是打包拖到服务器上。希望小型企业工作人员学习一下，配置可能复杂，但是你配置好了之后，你只需要把代码提交到Git或者Svn上，自动构建部署，非常方便。有任何地方不懂的翻到最下方随时咨询我，想帮助更多的初学者共同一起努力成长！
 
-![](picture/1578696-20200505205327591-604014428.png)
+![](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200505205327591-604014428-1622620648156.png)
 
 ## 1.2 环境准备
 
-![image-20210510095331698](picture/image-20210510095331698.png)
+![image-20210510095331698](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510095331698.png)
 
 ### 1.2.1 安装jenkins
 
@@ -47,7 +47,7 @@ docker pull jenkins/jenkins
 
 
 
-![img](picture/1578696-20200506003956565-2129663266.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506003956565-2129663266.png)
 
  2.创建Jenkins挂载目录并授权权限（我们在服务器上先创建一个jenkins工作目录 /var/jenkins_mount，赋予相应权限，稍后我们将jenkins容器目录挂载到这个目录上，这样我们就可以很方便地对容器内的配置文件进行修改。 如果我们不这样做，那么如果需要修改容器配置文件，将会有点麻烦，因为虽然我们可以使用docker exec -it --user root 容器id /bin/bash 命令进入容器目录，但是连简单的 vi命令都不能使用）
 
@@ -78,7 +78,7 @@ docker run -d -p 10240:8080 -p 10241:50000 -v /var/jenkins_mount:/var/jenkins_ho
 
  
 
-![img](picture/1578696-20200506010532861-1239060303.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506010532861-1239060303.png)
 
  自己的jenkins
 
@@ -96,7 +96,7 @@ docker run -it -d -p 10240:8080 -p 10241:5000 -u root -v ~/jenkins/jenkins_mount
 docker ps -l
 ```
 
-![img](picture/1578696-20200506011320515-2141868163.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506011320515-2141868163.png)
 
  5.查看docker容器日志。
 
@@ -104,7 +104,7 @@ docker ps -l
 docker logs myjenkins
 ```
 
-![img](picture/1578696-20200506011426781-1187586218.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506011426781-1187586218.png)
 
  6.配置镜像加速，进入 cd /var/jenkins_mount/ 目录。
 
@@ -112,13 +112,13 @@ docker logs myjenkins
 cd /var/jenkins_mount/
 ```
 
-![img](picture/1578696-20200506011630329-741219630.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506011630329-741219630.png)
 
 **修改 vi hudson.model.UpdateCenter.xml里的内容**
 
 **修改前**
 
-![img](picture/1578696-20200506012036877-994910766.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506012036877-994910766.png)
 
 将 url 修改为腾讯云官方镜像：
 
@@ -128,7 +128,7 @@ https://mirrors.cloud.tencent.com/jenkins/updates/update-center.json
 
 **修改后**
 
-![img](picture/1578696-20200506012119311-1420562634.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506012119311-1420562634.png)
 
 
 
@@ -151,7 +151,7 @@ apt-get update
 
 1. 访问Jenkins页面，输入你的ip加上10240
 
-![img](picture/1578696-20200506012226430-1099181802.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506012226430-1099181802.png)
 
 
 
@@ -161,13 +161,13 @@ apt-get update
 vi /var/jenkins_mount/secrets/initialAdminPassword
 ```
 
-![img](picture/1578696-20200506013101851-1902660911.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506013101851-1902660911.png)
 
  
 
 3. 到此以全部安装成功，尽情的使用吧！
 
-![img](picture/1578696-20200506013252174-1483206896.png)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/1578696-20200506013252174-1483206896.png)
 
  
 
@@ -182,7 +182,7 @@ vi /var/jenkins_mount/secrets/initialAdminPassword
 $ docker pull gitlab/gitlab-ce
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-c866f117b53fadf8.png?imageMogr2/auto-orient/strip|imageView2/2/w/565/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-c866f117b53fadf8.png)
 
 拉取镜像
 
@@ -200,7 +200,7 @@ docker run -d  -p 443:443 -p 80:80 -p 222:22 --name gitlab --restart always -v /
 
 
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-5818ed22c0bc1ee7.png?imageMogr2/auto-orient/strip|imageView2/2/w/467/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-5818ed22c0bc1ee7.png)
 
 运行成功
 
@@ -214,14 +214,12 @@ docker run -d  -p 443:443 -p 8088:80 -p 222:22 --name gitlab --restart always -v
 
 按上面的方式，gitlab容器运行没问题，但在gitlab上创建项目的时候，生成项目的URL访问地址是按容器的hostname来生成的，也就是容器的id。作为gitlab服务器，我们需要一个固定的URL访问地址，于是需要配置gitlab.rb（宿主机路径：/home/gitlab/config/gitlab.rb）。
 
-
-
 ```ruby
 # gitlab.rb文件内容默认全是注释
-$ vim /home/gitlab/config/gitlab.rb
+vim /home/gitlab/config/gitlab.rb
 ```
 
-
+配置文件
 
 ```ruby
 # 配置http协议所使用的访问地址,不加端口号默认为80
@@ -233,11 +231,9 @@ gitlab_rails['gitlab_shell_ssh_port'] = 222 # 此端口是run时22端口映射�
 :wq #保存配置文件并退出
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-a480f0de6409620a.png?imageMogr2/auto-orient/strip|imageView2/2/w/385/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-a480f0de6409620a.png)
 
 修改gitlab.rb文件
-
-
 
 ```ruby
 # 重启gitlab容器
@@ -251,13 +247,13 @@ docker restart gitlab
 
 第一次进入要输入新的root用户密码，设置好之后确定就行
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-6b04cfddeccf17bf.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-6b04cfddeccf17bf.png)
 
 gitlab页面
 
 下面我们就可以新建一个项目了，点击Create a project
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-2a40551dc13c2826.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-2a40551dc13c2826.png)
 
 Create a project
 
@@ -265,7 +261,7 @@ Create a project
 
 
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-0dd085723ef61677.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-0dd085723ef61677.png)
 
 创建完成！
 
@@ -276,7 +272,7 @@ Create a project
 双击git.exe安装git（一直点下一步，直到完成）
  点击电脑桌面空白地方右键看到如下两行即安装成功
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-7bbdee06b7ca7711.png?imageMogr2/auto-orient/strip|imageView2/2/w/321/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-7bbdee06b7ca7711.png)
 
 image.png
 
@@ -285,7 +281,7 @@ image.png
 > **url**：http://192.168.1.111
 >  填写账号密码登录
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-249a984d541801a1.png?imageMogr2/auto-orient/strip|imageView2/2/w/478/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-249a984d541801a1.png)
 
 登录页面
 
@@ -293,36 +289,32 @@ image.png
 
 1.打开本地git bash,使用如下命令生成ssh公钥和私钥对
 
-
-
 ```ruby
 ssh-keygen -t rsa -C 'xxx@xxx.com'
 ```
 
 然后一路回车(-C 参数是你的邮箱地址)
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-40be69316850b690.png?imageMogr2/auto-orient/strip|imageView2/2/w/579/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-40be69316850b690.png)
 
 生成密匙
 
 2.然后输入命令：
-
-
 
 ```ruby
 # ~表示用户目录，比如我的windows就是C:\Users\Administrator，并复制其中的内容
 cat ~/.ssh/id_rsa.pub
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-b71993bc58477957.png?imageMogr2/auto-orient/strip|imageView2/2/w/564/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-b71993bc58477957.png)
 
 公匙
 
 3.打开gitlab,找到Profile Settings-->SSH Keys--->Add SSH Key,并把上一步中复制的内容粘贴到Key所对应的文本框
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-d14c5051911fe20c.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-d14c5051911fe20c.png)
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-f7319dc3a9d83828.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-f7319dc3a9d83828.png)
 
 添加公匙到gitlab
 
@@ -330,17 +322,17 @@ cat ~/.ssh/id_rsa.pub
 
 1.回到gitlab页面点击projects->your projects
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-0105a84b02d1ed9e.png?imageMogr2/auto-orient/strip|imageView2/2/w/479/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-0105a84b02d1ed9e.png)
 
 2.选择一个需要克隆的项目，进入
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-7a7f3af7efcff81c.png?imageMogr2/auto-orient/strip|imageView2/2/w/734/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-7a7f3af7efcff81c.png)
 
 我的项目页面
 
 3.点击按钮复制地址
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-27e842b185a62e69.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-27e842b185a62e69.png)
 
 复制ssh地址
 
@@ -350,7 +342,7 @@ cat ~/.ssh/id_rsa.pub
 
 5.进入projects文件夹右键选择->Git Bash Here
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-e59886b042c02edf.png?imageMogr2/auto-orient/strip|imageView2/2/w/435/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-e59886b042c02edf.png)
 
 点击Git Bash Here
 
@@ -363,25 +355,23 @@ git config --global user.name "你的名字"
 git config --global user.email "你的邮箱"
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-9592daf5642e3c11.png?imageMogr2/auto-orient/strip|imageView2/2/w/370/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-9592daf5642e3c11.png)
 
 设置名字和邮箱
 
 7.克隆项目
 
-
-
 ```bash
 git clone 项目地址
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-dc8bafb214fa578e.png?imageMogr2/auto-orient/strip|imageView2/2/w/454/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-dc8bafb214fa578e.png)
 
 克隆项目
 
 8.查看projects文件夹，项目已经克隆下来了
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-94ec492febe71420.png?imageMogr2/auto-orient/strip|imageView2/2/w/634/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-94ec492febe71420.png)
 
 项目目录
 
@@ -389,24 +379,22 @@ git clone 项目地址
 
 1.基于以上步骤，在克隆的项目文件夹下新增一个测试文件
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-c230295d84a79064.png?imageMogr2/auto-orient/strip|imageView2/2/w/651/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-c230295d84a79064.png)
 
 新增txt文件
 
 2.查看同步状态
  在项目文件夹下右键点击->Git Bash Here
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-1fd767543b22d445.png?imageMogr2/auto-orient/strip|imageView2/2/w/445/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-1fd767543b22d445.png)
 
 输入
-
-
 
 ```ruby
 git status
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-364b83d323ceb46b.png?imageMogr2/auto-orient/strip|imageView2/2/w/562/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-364b83d323ceb46b.png)
 
 状态
 
@@ -414,43 +402,33 @@ git status
  3.提交代码
  输入
 
-
-
 ```csharp
 git add  测试提交的文件.txt
 ```
 
 (“git add“后加“.”则添加全部文件，也可以加"*.txt"表示添加全部需要提交的txt文件 )
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-2e3e95ecf96cc668.png?imageMogr2/auto-orient/strip|imageView2/2/w/558/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-2e3e95ecf96cc668.png)
 
 add需要提交的文件
 
 然后输入以下命令提交并添加提交信息
 
-
-
 ```ruby
 git commit -m "message"
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-6d689c385f30fe33.png?imageMogr2/auto-orient/strip|imageView2/2/w/560/format/webp)
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-6d689c385f30fe33.png)
 
 commit
 
 最后输出以下命令提交到gitlab
 
-
-
 ```ruby
 git push origin master
 ```
 
-![img](https:////upload-images.jianshu.io/upload_images/15087669-889169ad267f2997.png?imageMogr2/auto-orient/strip|imageView2/2/w/510/format/webp)
-
-
-
-
+![img](https://gitee.com/fakerlove/picture_1/raw/master/15087669-889169ad267f2997.png)
 
 ### 1.2.3 gitlab占用内存太多问题
 
@@ -471,13 +449,11 @@ gitlab-ctl restart
 
 
 
-
-
 # 2. 入门
 
 ## 2.1 安装中文插件
 
-![image-20210510095033219](picture/image-20210510095033219.png)
+![image-20210510095033219](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510095033219.png)
 
 
 
@@ -485,17 +461,15 @@ gitlab-ctl restart
 
 
 
-![image-20210510102844184](picture/image-20210510102844184.png)
+![image-20210510102844184](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510102844184.png)
 
 点击"Manage Roles"
 
-![image-20210510102901425](picture/image-20210510102901425.png)
+![image-20210510102901425](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510102901425.png)
 
 进行角色的管理
 
-![image-20210510102914324](picture/image-20210510102914324.png)
-
-## 
+![image-20210510102914324](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510102914324.png)
 
 
 
@@ -507,89 +481,89 @@ gitlab-ctl restart
 
 ## 2.4 jenkins拉取项目
 
-### gitlab 
+### 2.4.1 拉取gitlab 项目
 
 #### 1. 设置全局凭据
 
-![image-20210510103928691](picture/image-20210510103928691.png)
+![image-20210510103928691](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510103928691.png)
 
 点击添加凭据
 
-![image-20210510104120595](picture/image-20210510104120595.png)
+![image-20210510104120595](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510104120595.png)
 
 输入Gitee 账号、密码 ID可以任意填写，描述框可以根据项目来撰写
-![在这里插入图片描述](picture/20210125172004897.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172004897.png)
 
 类型项一定要选择
 
-![在这里插入图片描述](picture/20210125172017359.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172017359.png)
 
 #### 2. 新建Item
 
 Jenkins首页—Item—新建
 也可以进入到已有的Item里，再新建一个Item
 
-![在这里插入图片描述](picture/20210125172039419.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172039419.png)
 
 输入项目名称，一般用项目名称来命名，然后选择流水线，确定
 
-![在这里插入图片描述](picture/20210125172051784.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172051784.png)
 
 项目创建完毕
 
-![image-20210510104546158](picture/image-20210510104546158.png)
+![image-20210510104546158](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510104546158.png)
 
-#### 3、具体任务配置
+#### 3. 具体任务配置
 
 Jenkins首页—相应Item—配置----流水线—址—生成流水线脚本
 
-![在这里插入图片描述](picture/20210125172112844.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172112844.png)
 
 \#去gitee克隆代码地址
 
-![在这里插入图片描述](picture/20210125172126126.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172126126.png)
 
 配置在Jenkins上
 
-![在这里插入图片描述](picture/20210210201846492.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210210201846492.png)
 
-![在这里插入图片描述](picture/20210125172145431.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172145431.png)
 
 复制脚本
 
-![在这里插入图片描述](picture/20210125172156393.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172156393.png)
 
 \#这下面是配置构建脚本，注意Jenkins支持任何语言编写的项目的构建
-![在这里插入图片描述](picture/20210125172206281.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172206281.png)
 
 粘贴需要构建的代码链接和要执行的ssh命令，建议每次构建都加上ls -l 验证是否成功，应用 保存
 
-![在这里插入图片描述](picture/20210125172221619.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172221619.png)
 
 #### 4、构建验证
 
 进入任务，点击立即构建，成功的话会显示绿色，可以在Build History验证是否成功
 
-![在这里插入图片描述](picture/20210125172234687.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172234687.png)
 
 点击任务，进入任务页面，选择控制台输出，可以看到构建的详细日志，如果构建失败，可以在日志中查看失败原因：
-![在这里插入图片描述](picture/20210125172250520.png)
+![在这里插入图片描述](https://gitee.com/fakerlove/picture_1/raw/master/20210125172250520.png)
 
-### 拉取gitee 项目
+### 2.4.2 拉取gitee 项目
 
 #### 1. 安装gitee 插件
 
-![image-20210510104930930](picture/image-20210510104930930.png)
+![image-20210510104930930](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510104930930.png)
 
 #### 2. 添加Gitee链接配置
 
 前往 Jenkins -> Manage Jenkins -> Configure System -> Gitee Configuration -> Gitee connections
 
-![image-20210510105938146](picture/image-20210510105938146.png)
+![image-20210510105938146](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510105938146.png)
 
 点击进行数据的配置
 
-![image-20210510105954742](picture/image-20210510105954742.png)
+![image-20210510105954742](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510105954742.png)
 
 在 `Connection name` 中输入 `Gitee` 或者你想要的名字
 
@@ -603,7 +577,7 @@ Jenkins首页—相应Item—配置----流水线—址—生成流水线脚本
 > 4. `Gitee API Token` 输入你的Gitee私人令牌，获取地址：https://gitee.com/profile/personal_access_tokens
 > 5. `ID`, `Descripiton` 中输入你想要的 ID 和描述即可。
 
-![image-20210510110612637](picture/image-20210510110612637.png)
+![image-20210510110612637](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510110612637.png)
 
 1. `Credentials` 选择配置好的 Gitee APIV5 Token
 
@@ -614,7 +588,7 @@ Jenkins首页—相应Item—配置----流水线—址—生成流水线脚本
 ![image-20210510110655803](picture/image-20210510110655803.png)
 
 配置成功后如图所示：
-![Gitee链接配置](picture/185651_68707d16_58426.png)
+![Gitee链接配置](https://gitee.com/fakerlove/picture_1/raw/master/185651_68707d16_58426.png)
 
 #### 3. 新建构建任务
 
@@ -624,7 +598,7 @@ Jenkins首页—相应Item—配置----流水线—址—生成流水线脚本
 
 任务全局配置中需要选择前一步中的Gitee链接。前往某个任务（如'Gitee Test'）的 Configure -> General，Gitee connection 中选择前面所配置的Gitee链接，如图：
 
-![image-20210510111209353](picture/image-20210510111209353.png)
+![image-20210510111209353](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510111209353.png)
 
 
 
@@ -682,7 +656,7 @@ vim webapps/manager/META-INF/context.xml
 
 注释信息
 
-![image-20210518154402642](picture/image-20210518154402642.png)
+![image-20210518154402642](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518154402642.png)
 
 ~~~bash
 <!-- 
@@ -698,7 +672,7 @@ vim conf/server.xml
 
 修改完配置为
 
-![image-20210518154843683](picture/image-20210518154843683.png)
+![image-20210518154843683](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518154843683.png)
 
 
 
@@ -708,17 +682,17 @@ vim conf/server.xml
 ./startup.sh
 ~~~
 
-![image-20210518155025222](picture/image-20210518155025222.png)
+![image-20210518155025222](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518155025222.png)
 
 
 
 输入tomcat,密码tomcat
 
-![image-20210518155050999](picture/image-20210518155050999.png)
+![image-20210518155050999](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518155050999.png)
 
 进入管理界面
 
-![image-20210518155250939](picture/image-20210518155250939.png)
+![image-20210518155250939](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518155250939.png)
 
 
 
@@ -732,13 +706,13 @@ vim conf/server.xml
 
 ### 3.1.1 拉取代码
 
-![image-20210518160244635](picture/image-20210518160244635.png)
+![image-20210518160244635](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518160244635.png)
 
 ### 3.1.2 编译
 
 构建->添加构建步骤->Executor Shell
 
-![image-20210518160456620](picture/image-20210518160456620.png)
+![image-20210518160456620](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518160456620.png)
 
 ~~~bash
 echo "开始编译和打包" 
@@ -746,13 +720,13 @@ mvn clean package
 echo "编译和打包结束"
 ~~~
 
-![image-20210518160557558](picture/image-20210518160557558.png)
+![image-20210518160557558](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518160557558.png)
 
 
 
 这个时候会报错，
 
-![image-20210518161038144](picture/image-20210518161038144.png)
+![image-20210518161038144](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518161038144.png)
 
 解决方法
 
@@ -762,7 +736,7 @@ echo $PATH
 
 复制path 路径，点击全局配置，添加全局属性
 
-![image-20210518161757355](picture/image-20210518161757355.png)
+![image-20210518161757355](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518161757355.png)
 
 ### 3.1.3 部署
 
@@ -772,15 +746,15 @@ echo $PATH
 
 点击构建后操作
 
-![image-20210518162545887](picture/image-20210518162545887.png)
+![image-20210518162545887](https://gitee.com/fakerlove/picture_1/raw/master/image-20210518162545887.png)
 
 添加tomcat 的凭证
 
-![image-20210519101442247](picture/image-20210519101442247.png)
+![image-20210519101442247](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519101442247.png)
 
 构件后操作
 
-![image-20210519101503486](picture/image-20210519101503486.png)
+![image-20210519101503486](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519101503486.png)
 
 就可以打包成功
 
@@ -788,17 +762,17 @@ echo $PATH
 
 ### 3.2.1 安装Maven Integration插件
 
-![image-20210519111628230](picture/image-20210519111628230.png)
+![image-20210519111628230](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519111628230.png)
 
 ### 3.2.2 创建Maven项目
 
-![image-20210519111646577](picture/image-20210519111646577.png)
+![image-20210519111646577](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519111646577.png)
 
 
 
 ### 3.2.3 配置项目
 
-![image-20210519111712992](picture/image-20210519111712992.png)
+![image-20210519111712992](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519111712992.png)
 
 
 
@@ -818,39 +792,39 @@ echo $PATH
 
 ### 3.3.1 安装pipline 
 
-![image-20210519160939109](picture/image-20210519160939109.png)
+![image-20210519160939109](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519160939109.png)
 
 
 
 ### 3.3.2 创建项目
 
-![image-20210519161009364](picture/image-20210519161009364.png)
+![image-20210519161009364](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519161009364.png)
 
 
 
 ### 3.3.3 拉取代码
 
-![image-20210519161033183](picture/image-20210519161033183.png)
+![image-20210519161033183](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519161033183.png)
 
 自定义流水线
 
 
 
-![image-20210519161120562](picture/image-20210519161120562.png)
+![image-20210519161120562](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519161120562.png)
 
 构建流水线语法
 
-![image-20210519162445601](picture/image-20210519162445601.png)
+![image-20210519162445601](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519162445601.png)
 
 拉取代码
 
-![image-20210519162647350](picture/image-20210519162647350.png)
+![image-20210519162647350](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519162647350.png)
 
 
 
 生成pipline 代码
 
-![image-20210519162806786](picture/image-20210519162806786.png)
+![image-20210519162806786](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519162806786.png)
 
 构件代码
 
@@ -882,13 +856,13 @@ pipeline {
 
 ### 3.3.4 构建成功
 
-![image-20210519161212583](picture/image-20210519161212583.png)
+![image-20210519161212583](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519161212583.png)
 
 ## 3.4 jenkins 常见的触发器
 
 jenkins 常见触发器
 
-![image-20210519170109920](picture/image-20210519170109920.png)
+![image-20210519170109920](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519170109920.png)
 
 其中gitee为安装了gitee 插件后，出现的触发
 
@@ -909,23 +883,23 @@ https://gitee.com/help/articles/4193#article-header9
 
 在jenkins 上设置触发器，点击生成秘钥
 
-![image-20210519171306631](picture/image-20210519171306631.png)
+![image-20210519171306631](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519171306631.png)
 
 gitee设置webHook
 
-![image-20210519171342064](picture/image-20210519171342064.png)
+![image-20210519171342064](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519171342064.png)
 
 
 
 修改代码，提交至gitee,jenkins立即进行了刷新测试
 
-![image-20210519171638974](picture/image-20210519171638974.png)
+![image-20210519171638974](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519171638974.png)
 
 ### 3.4.2 触发远程构建
 
 设置token信息
 
-![image-20210519171843116](picture/image-20210519171843116.png)
+![image-20210519171843116](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519171843116.png)
 
 输入网址即可进行触发
 
@@ -937,15 +911,15 @@ http://192.168.66.101:8888/job/web_demo_pipeline/build?token=6666
 
 创建pre_job流水线工程
 
-![image-20210519173346089](picture/image-20210519173346089.png)
+![image-20210519173346089](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519173346089.png)
 
 配置需要触发的工程
 
-![image-20210519173408602](picture/image-20210519173408602.png)
+![image-20210519173408602](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519173408602.png)
 
 ### 3.4.4 定时构建
 
-![image-20210519173428203](picture/image-20210519173428203.png)
+![image-20210519173428203](https://gitee.com/fakerlove/picture_1/raw/master/image-20210519173428203.png)
 
 > 每30分钟构建一次：H代表形参 H/30 * * * * 10:02 10:32
 >
@@ -973,7 +947,7 @@ http://192.168.66.101:8888/job/web_demo_pipeline/build?token=6666
 
 ### 3.5.1 安装插件
 
-![image-20210520102548901](picture/image-20210520102548901.png)
+![image-20210520102548901](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520102548901.png)
 
 
 
@@ -981,15 +955,15 @@ http://192.168.66.101:8888/job/web_demo_pipeline/build?token=6666
 
 开启权限
 
-![image-20210520103028041](picture/image-20210520103028041.png)
+![image-20210520103028041](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520103028041.png)
 
 点击生成授权码
 
-![image-20210520103307250](picture/image-20210520103307250.png)
+![image-20210520103307250](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520103307250.png)
 
 发送配置短信，发送完成后，点击我已发送、获取密码
 
-![image-20210520103323603](picture/image-20210520103323603.png)
+![image-20210520103323603](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520103323603.png)
 
 
 
@@ -997,21 +971,21 @@ http://192.168.66.101:8888/job/web_demo_pipeline/build?token=6666
 
 配置邮件管理员
 
-![image-20210520105311778](picture/image-20210520105311778.png)
+![image-20210520105311778](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520105311778.png)
 
 配置Extended
 
-![image-20210520105355585](picture/image-20210520105355585.png)
+![image-20210520105355585](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520105355585.png)
 
 配置 jenkins 默认邮箱
 
-![image-20210520105543453](picture/image-20210520105543453.png)
+![image-20210520105543453](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520105543453.png)
 
 
 
 点击测试
 
-![image-20210520105600860](picture/image-20210520105600860.png)
+![image-20210520105600860](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520105600860.png)
 
 
 
@@ -1104,7 +1078,7 @@ http://192.168.66.101:8888/job/web_demo_pipeline/build?token=6666
 </html>
 ~~~
 
-![image-20210520110622468](picture/image-20210520110622468.png)
+![image-20210520110622468](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520110622468.png)
 
 
 
@@ -1146,7 +1120,7 @@ pipeline {
 
 点击重新构建，构建完成后，会接收到邮件信息
 
-![image-20210520112034362](picture/image-20210520112034362.png)
+![image-20210520112034362](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520112034362.png)
 
 
 
@@ -1160,7 +1134,7 @@ pipeline {
 
 ## 4.1 环境准备
 
-![image-20210520163648458](picture/image-20210520163648458.png)
+![image-20210520163648458](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520163648458.png)
 
 * docker
 * jenkins 
@@ -1169,7 +1143,7 @@ pipeline {
 
 ### 4.1.1 docker的安装
 
-centos 7
+#### centos 7
 
 ~~~bash
 yum remove docker \
@@ -1190,7 +1164,7 @@ systemctl start docker
 docker version
 ~~~
 
-centos 8
+#### centos 8
 
 ~~~bash
 yum remove docker \
@@ -1212,7 +1186,7 @@ systemctl start docker
 docker version
 ~~~
 
-容器镜像加速
+#### 容器镜像加速
 
 ~~~bash
 sudo mkdir -p /etc/docker
@@ -1224,8 +1198,6 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 ~~~
-
-
 
 ### 4.1.2 docker-compose 安装
 
@@ -1263,7 +1235,7 @@ https://github.com/goharbor/harbor/tags
 
 最低的需求配置
 
-![image-20210520151346044](picture/image-20210520151346044.png)
+![image-20210520151346044](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520151346044.png)
 
 上传下载的软件，并解压
 
@@ -1281,7 +1253,7 @@ vim harbor.yml
 
 修改一下三个部分信息
 
-![image-20210521212145966](picture/image-20210521212145966.png)
+![image-20210521212145966](https://gitee.com/fakerlove/picture_1/raw/master/image-20210521212145966.png)
 
 
 
@@ -1291,7 +1263,7 @@ vim harbor.yml
 ./install.sh
 ~~~
 
-![image-20210520161403576](picture/image-20210520161403576.png)
+![image-20210520161403576](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520161403576.png)
 
 等启动成功,输入网址
 
@@ -1299,13 +1271,13 @@ vim harbor.yml
 http://121.37.175.163/
 ~~~
 
-![image-20210520161615617](picture/image-20210520161615617.png)
+![image-20210520161615617](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520161615617.png)
 
 
 
 如果默认80 网址，有服务，即可修改端口信息
 
-![image-20210520161626732](picture/image-20210520161626732.png)
+![image-20210520161626732](https://gitee.com/fakerlove/picture_1/raw/master/image-20210520161626732.png)
 
 
 
@@ -1315,7 +1287,7 @@ http://121.37.175.163/
 
 创建harbor项目
 
-![image-20210521094535809](picture/image-20210521094535809.png)
+![image-20210521094535809](https://gitee.com/fakerlove/picture_1/raw/master/image-20210521094535809.png)
 
 创建镜像，给镜像把tag
 
@@ -1329,11 +1301,11 @@ http://121.37.175.163/
 docker tag jenkins/jenkins:latest 121.37.175.163/clock/kk:1.0
 ~~~
 
-![image-20210521213410151](picture/image-20210521213410151.png)
+![image-20210521213410151](https://gitee.com/fakerlove/picture_1/raw/master/image-20210521213410151.png)
 
 添加受信任名单
 
-![image-20210521095547573](picture/image-20210521095547573.png)
+![image-20210521095547573](https://gitee.com/fakerlove/picture_1/raw/master/image-20210521095547573.png)
 
 ~~~bash
 vim /etc/docker/daemon.json
@@ -1362,7 +1334,7 @@ docker login 121.37.175.163 -u admin -p 123456
 docker push  121.37.175.163/clock/kk:1.0
 ~~~
 
-![image-20210522115421027](picture/image-20210522115421027.png)
+![image-20210522115421027](https://gitee.com/fakerlove/picture_1/raw/master/image-20210522115421027.png)
 
 如果报错
 
@@ -1418,7 +1390,7 @@ ENTRYPOINT ["java", "-jar","/app.jar"]
 
 
 
-![image-20210522170028697](picture/image-20210522170028697.png)
+![image-20210522170028697](https://gitee.com/fakerlove/picture_1/raw/master/image-20210522170028697.png)
 
 修改jenkins 信息
 
@@ -1428,7 +1400,7 @@ ENTRYPOINT ["java", "-jar","/app.jar"]
 
 使用流水线语法，进行上传服务
 
-![image-20210523095155330](picture/image-20210523095155330.png)
+![image-20210523095155330](https://gitee.com/fakerlove/picture_1/raw/master/image-20210523095155330.png)
 
 ~~~groovy
 pipeline {
@@ -1496,7 +1468,7 @@ pipeline {
 
 安装以下插件，可以实现远程发送Shell命令
 
-![image-20210523095613420](picture/image-20210523095613420.png)
+![image-20210523095613420](https://gitee.com/fakerlove/picture_1/raw/master/image-20210523095613420.png)
 
 
 
@@ -1525,7 +1497,7 @@ ssh-keygen -m PEM -t rsa -b 4096
 ssh-copy-id 121.37.175.163
 ~~~
 
-![image-20210523100212577](picture/image-20210523100212577.png)
+![image-20210523100212577](https://gitee.com/fakerlove/picture_1/raw/master/image-20210523100212577.png)
 
 
 
@@ -1540,17 +1512,17 @@ mkdir /var/lib/jenkins/.ssh
 cp /root/.ssh/* /var/lib/jenkins/.ssh/
 ~~~
 
-![image-20210523101501916](picture/image-20210523101501916.png)
+![image-20210523101501916](https://gitee.com/fakerlove/picture_1/raw/master/image-20210523101501916.png)
 
 点击测试
 
-![image-20210523161243920](picture/image-20210523161243920.png)
+![image-20210523161243920](https://gitee.com/fakerlove/picture_1/raw/master/image-20210523161243920.png)
 
 #### 3) 上传代码
 
 使用流水线语法生成器
 
-![](picture/image-20210523165536347.png)
+![](https://gitee.com/fakerlove/picture_1/raw/master/image-20210523165536347.png)
 
 
 
@@ -1613,10 +1585,6 @@ docker pull $imageName
 docker run -di -p $port:$port -v /etc/localtime:/etc/localtime $imageName
 echo "容器启动成功"
 ~~~
-
-
-
-
 
 ### <font color=red>4.2.5 出现的错误如下</font>
 
@@ -1764,7 +1732,7 @@ yum -y install nginx
 vi /etc/nginx/nginx.conf
 ~~~
 
-![image-20210524103241829](picture/image-20210524103241829.png)
+![image-20210524103241829](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524103241829.png)
 
 
 
@@ -1776,7 +1744,7 @@ vi /etc/selinux/config
 
 永久关闭 SELINUX=disabled
 
-![image-20210524103436326](picture/image-20210524103436326.png)
+![image-20210524103436326](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524103436326.png)
 
 
 
@@ -1786,7 +1754,7 @@ vi /etc/selinux/config
 systemctl start nginx
 ~~~
 
-![image-20210524103555607](picture/image-20210524103555607.png)
+![image-20210524103555607](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524103555607.png)
 
 
 
@@ -1794,7 +1762,7 @@ systemctl start nginx
 
 搜索插件NodeJS
 
-![image-20210524104356108](picture/image-20210524104356108.png)
+![image-20210524104356108](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524104356108.png)
 
 ### 4.3.3 安装nodejs
 
@@ -1816,19 +1784,19 @@ export PATH=/var/lib/node/bin:$PATH
 source /etc/profile
 ~~~
 
-![image-20210524145722467](picture/image-20210524145722467.png)
+![image-20210524145722467](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524145722467.png)
 
 ### 4.3.4 创建项目
 
 一定要修改连接的根目录，不然会出现问题
 
-![image-20210524153948557](picture/image-20210524153948557.png)
+![image-20210524153948557](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524153948557.png)
 
 创建一个Vue的项目。vue-cli3 脚手架创建项目。然后创建Jenkinsfile 文件
 
 在流水线语法生成器，生成语法
 
-![image-20210524145646139](picture/image-20210524145646139.png)
+![image-20210524145646139](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524145646139.png)
 
 ### 4.3.5 Jenkinsfile 代码
 
@@ -1850,7 +1818,7 @@ source /etc/profile
 mvn -f common clean install
 ~~~
 
-![image-20210524190538534](picture/image-20210524190538534.png)
+![image-20210524190538534](https://gitee.com/fakerlove/picture_1/raw/master/image-20210524190538534.png)
 
 
 
@@ -1894,6 +1862,3 @@ eureka:
 ### 4.4.2 安装插件
 
 安装Extended Choice Parameter 
-
-
-

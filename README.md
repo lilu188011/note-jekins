@@ -1,3 +1,13 @@
+
+
+<font color=red size=5>文章链接</font>
+
+~~~bash
+https://gitee.com/fakerlove/jenkins
+~~~
+
+
+
 #  Jenkins 教程
 
 # 1. 简介
@@ -585,7 +595,7 @@ Jenkins首页—相应Item—配置----流水线—址—生成流水线脚本
 
 3. 点击 `Test Connection` 测试链接是否成功，如失败请检查以上 3，5，6 步骤。
 
-![image-20210510110655803](picture/image-20210510110655803.png)
+![image-20210510110655803](https://gitee.com/fakerlove/picture_1/raw/master/image-20210510110655803.png)
 
 配置成功后如图所示：
 ![Gitee链接配置](https://gitee.com/fakerlove/picture_1/raw/master/185651_68707d16_58426.png)

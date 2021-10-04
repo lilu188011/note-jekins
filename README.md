@@ -39,11 +39,34 @@ http://mirrors.ustc.edu.cn/jenkins/
 
 ~~~bash
 yum install -y java-1.8.0-openjdk* -y
-wget https://mirrors.tuna.tsinghua.edu.cn/jenkins/redhat-stable/jenkins-2.277.4-1.1.noarch.rpm
-rpm -ivh jenkins-2.277.4-1.1.noarch.rpm
+wget https://mirrors.cloud.tencent.com/jenkins/redhat-stable/jenkins-2.303.1-1.1.noarch.rpm
+rpm -ivh jenkins-2.303.1-1.1.noarch.rpm
 yum install jenkins
 systemctl start jenkins
 ~~~
+
+访问网站，即可出现网址
+
+~~~bash
+http://localhost:8080
+~~~
+
+查看应用状态
+
+~~~bash
+systemctl status jenkins
+~~~
+
+<font color=red size=4>可能会出现问题</font>
+
+daemonize is needed by jenkins-2.303.1-1.1.noarch
+
+~~~bash
+yum  -y install epel-release
+yum -y install daemonize
+~~~
+
+
 
 #### 2) docker 安装
 
@@ -1546,7 +1569,7 @@ cp /root/.ssh/* /var/lib/jenkins/.ssh/
                     sshTransfer(
                         cleanRemote: false,
                         excludes: '',
-                        execCommand: "/opt/jenkins_shell/deploy.sh $harbor_url $harbor_project_name $project_name $tag $port",
+                        execCommand: "/root/deploy.sh $harbor_url $harbor_project_name $project_name $tag $port",
                         execTimeout: 120000,
                         flatten: false,
                         makeEmptyDirs: false,
@@ -1564,7 +1587,7 @@ cp /root/.ssh/* /var/lib/jenkins/.ssh/
 在部署服务的服务器上创建deploy.sh
 
 ~~~bash
-#! /bin/sh #接收外部参数 
+#! /bin/sh
 harbor_url=$1 
 harbor_project_name=$2 
 project_name=$3 
@@ -1598,43 +1621,73 @@ echo "容器启动成功"
 
 ### <font color=red>4.2.5 出现的错误如下</font>
 
-1. 找不到打包插件
+<font color=red>找不到打包插件</font>
 
-   更换maven 镜像
+更换maven 镜像
 
-   ~~~bash
-   	<mirror>
-   			<id>
-   				alimaven
-   			</id>
-   			
-   			<mirrorOf>
-   				*
-   			</mirrorOf>
-   			
-   			<name>
-   				aliyun maven
-   			</name>
-   			
-   			<url>
-   				https://maven.aliyun.com/repository/public
-   			</url>
-   		</mirror>
-   ~~~
+~~~bash
+	<mirror>
+			<id>
+				alimaven
+			</id>
+			
+			<mirrorOf>
+				*
+			</mirrorOf>
+			
+			<name>
+				aliyun maven
+			</name>
+			
+			<url>
+				https://maven.aliyun.com/repository/public
+			</url>
+		</mirror>
+~~~
 
-2. 无法创建maven包
+<font color=red>无法创建maven包</font>
 
-   修改maven 仓库权限
+修改maven 仓库权限
 
-   ~~~bash
-   chmod 777 /var/lib/res
-   ~~~
+~~~bash
+chmod 777 /var/lib/res
+~~~
 
-3. Jenkins: unix://localhost:80: Permission denied
+<font color=red>Jenkins: unix://localhost:80: Permission denied</font>
 
-   ~~~bash
-   chmod 777 /var/run/docker.sock
-   ~~~
+~~~bash
+chmod 777 /var/run/docker.sock
+~~~
+
+<font color=red>还有常见的错误</font>
+
+~~~bash
+https://blog.csdn.net/weixin_43824748/article/details/109044848
+~~~
+
+修改配置文件
+
+~~~bash
+vim /etc/sysconfig/jenkinsjenkins改成root
+~~~
+
+jenkins改成root
+
+~~~bash
+JENKINS_USER="root"
+~~~
+
+
+
+修改Jenkins相关文件夹用户权限
+
+~~~bash
+chown -R root:root /var/lib/jenkins
+chown -R root:root /var/cache/jenkins
+chown -R root:root /var/log/jenkins
+~~~
+
+
 
 
 
